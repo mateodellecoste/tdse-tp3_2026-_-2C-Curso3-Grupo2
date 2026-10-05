@@ -1,0 +1,21 @@
+17:01:11 **** Incremental Build of configuration Debug for project tdse-tp3_02-porting_c_code ****
+make -j8 all 
+arm-none-eabi-gcc "../app/src/task_display.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../app/inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"app/src/task_display.d" -MT"app/src/task_display.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "app/src/task_display.o"
+arm-none-eabi-gcc -o "tdse-tp3_02-porting_c_code.elf" @"objects.list"  -lrdimon -mcpu=cortex-m3 -T"C:\Users\alang\Desktop\tse\TP3\tdse-tp3_02-porting_c_code\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="tdse-tp3_02-porting_c_code.map" -Wl,--gc-sections -static -specs=rdimon.specs --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: tdse-tp3_02-porting_c_code.elf
+ 
+arm-none-eabi-size  tdse-tp3_02-porting_c_code.elf 
+arm-none-eabi-objdump -h -S tdse-tp3_02-porting_c_code.elf  > "tdse-tp3_02-porting_c_code.list"
+   text	   data	    bss	    dec	    hex	filename
+  16376	    148	   2332	  18856	   49a8	tdse-tp3_02-porting_c_code.elf
+Finished building: default.size.stdout
+ 
+Finished building: tdse-tp3_02-porting_c_code.list
+ 
+17:01:18 **** Incremental Build of configuration Debug for project tdse-tp3_02-porting_c_code ****
+make -j8 all 
+arm-none-eabi-size  tdse-tp3_02-porting_c_code.elf 
+   text	   data	    bss	    dec	    hex	filename
+  16376	    148	   2332	  18856	   49a8	tdse-tp3_02-porting_c_code.elf
+Finished building: default.size.stdout
+ 
