@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 ../app/src/logger.c:67:6:logger_log_print_	16	static
+=======
+../app/src/logger.c:67:6:logger_log_print_	16	static
+>>>>>>> ff0b824 (Subo Itemis Creat)

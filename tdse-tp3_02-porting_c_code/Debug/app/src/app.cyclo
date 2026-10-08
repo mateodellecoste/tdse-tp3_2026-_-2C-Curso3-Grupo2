@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 ../app/src/app.c:93:6:app_init	2
 ../app/src/app.c:129:6:app_update	7
+=======
+../app/src/app.c:93:6:app_init	2
+../app/src/app.c:129:6:app_update	7
+>>>>>>> ff0b824 (Subo Itemis Creat)

@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 ../Core/Src/system_stm32f1xx.c:175:6:SystemInit	4	static
 ../Core/Src/system_stm32f1xx.c:224:6:SystemCoreClockUpdate	24	static
+=======
+../Core/Src/system_stm32f1xx.c:175:6:SystemInit	4	static
+../Core/Src/system_stm32f1xx.c:224:6:SystemCoreClockUpdate	24	static
+>>>>>>> ff0b824 (Subo Itemis Creat)

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ../app/src/display.c:109:6:displayInit	3
 ../app/src/display.c:185:6:displayCharPositionWrite	5
 ../app/src/display.c:222:6:displayStringWrite	2
@@ -5,3 +6,12 @@
 ../app/src/display.c:237:13:displayCodeWrite	2
 ../app/src/display.c:247:13:displayPinWrite	9
 ../app/src/display.c:296:13:displayDataBusWrite	4
+=======
+../app/src/display.c:114:6:displayInit	3
+../app/src/display.c:189:6:displayCharPositionWrite	5
+../app/src/display.c:226:6:displayStringWrite	2
+../app/src/display.c:232:6:displayDataWrite	1
+../app/src/display.c:236:13:displayCodeWrite	2
+../app/src/display.c:246:13:displayPinWrite	9
+../app/src/display.c:296:13:displayDataBusWrite	4
+>>>>>>> ff0b824 (Subo Itemis Creat)

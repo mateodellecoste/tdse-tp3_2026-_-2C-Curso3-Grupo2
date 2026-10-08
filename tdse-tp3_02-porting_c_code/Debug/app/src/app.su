@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 ../app/src/app.c:93:6:app_init	32	static,ignoring_inline_asm
 ../app/src/app.c:129:6:app_update	16	static,ignoring_inline_asm
+=======
+../app/src/app.c:93:6:app_init	32	static,ignoring_inline_asm
+../app/src/app.c:129:6:app_update	16	static,ignoring_inline_asm
+>>>>>>> ff0b824 (Subo Itemis Creat)

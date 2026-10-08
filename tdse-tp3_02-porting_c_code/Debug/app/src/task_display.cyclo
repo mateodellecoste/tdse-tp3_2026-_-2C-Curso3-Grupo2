@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 ../app/src/task_display.c:69:6:task_display_init	2
 ../app/src/task_display.c:109:6:task_display_update	1
 ../app/src/task_display.c:115:6:task_display_statechart	11
+=======
+../app/src/task_display.c:69:6:task_display_init	2
+../app/src/task_display.c:114:6:task_display_update	1
+../app/src/task_display.c:120:6:task_display_statechart	10
+>>>>>>> ff0b824 (Subo Itemis Creat)
