@@ -3,6 +3,13 @@
 	<item key="hasShownOverlayPopupBefore" value="true"/>
 	<item key="replaceBarOpen" value="false"/>
 	<list key="searchhistory">
+		<item value="typedef struct&#x0A;{&#x0A;&#x09;uint32_t&#x09;&#x09;&#x09;tick;&#x0A;&#x09;task_system_st_t&#x09;state;&#x0A;&#x09;task_system_ev_t&#x09;event;&#x0A;&#x09;bool&#x09;&#x09;&#x09;&#x09;flag;&#x0A;} task_system_dta_t;"/>
+		<item value="task_system_dta_t"/>
+		<item value="task_system_normal_statechart()"/>
+		<item value="task_system_dta_t task_system_dta_list[SYSTEM_DTA_QTY];"/>
+		<item value="state_task"/>
+		<item value="task_sys"/>
+		<item value="normal"/>
 		<item value="task_display_init()"/>
 		<item value="true"/>
 		<item value="displayinit"/>

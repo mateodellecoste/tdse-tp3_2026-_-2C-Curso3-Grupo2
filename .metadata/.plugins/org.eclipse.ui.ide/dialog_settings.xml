@@ -7,6 +7,8 @@
 		<item key="WizardProjectsImportPage.STORE_CLOSE_CREATED_PROJECTS_ID" value="false"/>
 		<item key="WizardProjectsImportPage.STORE_HIDE_CONFLICTING_PROJECTS_ID" value="false"/>
 		<list key="WizardProjectsImportPage.STORE_DIRECTORIES">
+			<item value="C:\Users\alang\Desktop\tse\TP3\tdse-tp3_03-system_setup_menu"/>
+			<item value="C:\Users\alang\Desktop\tse\TP3\tdse-tp3_04-system_setup_menu"/>
 			<item value="C:\Users\alang\Desktop\tse\TP3\tdse-tp3_02-porting_c_code"/>
 			<item value="C:\Users\alang\Desktop\tse\TP3\tdse-tp3_01-porting_c_code"/>
 		</list>
@@ -14,8 +16,8 @@
 			<item value=""/>
 		</list>
 		<section name="ExternalProjectImportWizard.dialogBounds">
-			<item key="DIALOG_X_ORIGIN" value="706"/>
-			<item key="DIALOG_Y_ORIGIN" value="187"/>
+			<item key="DIALOG_X_ORIGIN" value="426"/>
+			<item key="DIALOG_Y_ORIGIN" value="18"/>
 			<item key="DIALOG_WIDTH" value="525"/>
 			<item key="DIALOG_HEIGHT" value="710"/>
 			<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>

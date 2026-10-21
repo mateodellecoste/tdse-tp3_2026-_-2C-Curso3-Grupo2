@@ -1,1 +1,5 @@
 task_dta_list
+g_task_system_mode
+task_display_dta
+task_actuator_dta_list
+task_sensor_dta_list
