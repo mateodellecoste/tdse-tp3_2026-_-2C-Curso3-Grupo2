@@ -43,7 +43,7 @@ extern "C" {
 /********************** inclusions *******************************************/
 
 /********************** macros ***********************************************/
-
+#define CANT_MOTORES 2
 /********************** typedef **********************************************/
 /* Events to excite Task System */
 typedef enum task_system_ev {EV_SYS_IDLE,
@@ -54,7 +54,22 @@ typedef enum task_system_ev {EV_SYS_IDLE,
 
 /* State of Task System */
 typedef enum task_system_st {ST_SYS_IDLE,
-							 ST_SYS_ACTIVE} task_system_st_t;
+							ST_SYS_ACTIVE,
+							ST_SYS_MAIN,
+							ST_SYS_MENU_1,
+							ST_SYS_MENU_2,
+							ST_SYS_MENU_3} task_system_st_t;
+
+typedef enum spin {LEFT, RIGHT, SPIN_QTY} spin_t;
+
+typedef struct
+{
+	uint32_t speed;
+	bool power;
+	spin_t spin;
+} param_motor_t;
+
+typedef enum param {SPEED, POWER, SPIN, PARAM_QTY} param_t;
 
 typedef struct
 {
@@ -62,6 +77,9 @@ typedef struct
 	task_system_st_t	state;
 	task_system_ev_t	event;
 	bool				flag;
+	param_motor_t param_motor[CANT_MOTORES];
+	uint32_t motor_idx;
+	param_t parametro_idx;
 } task_system_dta_t;
 
 /********************** external data declaration ****************************/

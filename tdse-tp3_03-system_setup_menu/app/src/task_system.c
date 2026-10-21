@@ -36,6 +36,10 @@
 /* Project includes */
 #include "main.h"
 
+/* Standard C includes */
+#include <stdio.h>		/* snprintf */
+#include <string.h>		/* strlen */
+
 /* Demo includes */
 #include "logger.h"
 #include "dwt.h"
@@ -60,6 +64,17 @@
 typedef enum task_system_mode {NORMAL, SETUP, MODE_QTY} task_system_mode_t;
 
 #define SYSTEM_DTA_QTY	MODE_QTY
+#define MOTOR_INICIAL 0
+#define PARAM_INICIAL SPEED
+#define SPEED_INICIAL 8
+#define POWER_INICIAL true
+#define SPIN_INICIAL LEFT
+#define MAX_SPEED 9
+
+/* Ancho de una línea del LCD (si task_display_attribute.h no lo define) */
+#ifndef COLUMNS
+#define COLUMNS 16
+#endif
 
 /********************** internal data declaration ****************************/
 task_system_dta_t task_system_dta_list[SYSTEM_DTA_QTY];
@@ -70,10 +85,17 @@ void task_system_setup_statechart(void);
 
 void task_system_set_mode(task_system_mode_t);
 
+static void task_system_setup_display(task_system_dta_t *p_dta);
+static void task_system_pad_line(char *line);
+
 /********************** internal data definition *****************************/
 const char *p_task_system 		= "Task System (System Statechart)";
 const char *p_task_system_ 		= "Non-Blocking Code";
 const char *p_task_system__ 	= "(Update by Time Code, period = 1mS)";
+
+/* Textos del menu: mismo orden que los enum param_t y spin_t */
+static const char *p_param_name[PARAM_QTY] = {"Speed", "Power", "Spin"};
+static const char *p_spin_name[SPIN_QTY]   = {"LEFT", "RIGHT"};
 
 /********************** external data declaration ****************************/
 task_system_mode_t g_task_system_mode;
@@ -83,9 +105,6 @@ void task_system_init(void *parameters)
 {
 	uint32_t index;
 	task_system_dta_t 	*p_task_system_dta;
-	task_system_st_t	state;
-	task_system_ev_t	event;
-	bool b_event;
 
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
@@ -98,27 +117,48 @@ void task_system_init(void *parameters)
 
 	task_system_set_mode(NORMAL);
 
-	for (index = 0; SYSTEM_DTA_QTY > index; index++)
+
+	/* Update Task System Data Pointer */
+	p_task_system_dta = &task_system_dta_list[NORMAL];
+
+	/* Init & Print out: Task execution FSM */
+	p_task_system_dta->state = ST_SYS_IDLE;
+	p_task_system_dta->event = EV_SYS_IDLE;
+	p_task_system_dta->flag = false;
+
+	LOGGER_INFO(" ");
+	LOGGER_INFO("   %s = %lu   %s = %lu   %s = %s",
+				GET_NAME(state), (uint32_t)p_task_system_dta->state,
+				GET_NAME(event), (uint32_t)p_task_system_dta->event,
+				GET_NAME(b_event), (p_task_system_dta->flag ? "true" : "false"));
+
+	/* Update Task System Data Pointer */
+	p_task_system_dta = &task_system_dta_list[SETUP];
+
+	/* Init & Print out: Task execution FSM */
+	p_task_system_dta->state = ST_SYS_MAIN;
+	p_task_system_dta->event = EV_SYS_IDLE;
+	p_task_system_dta->flag = false;
+	p_task_system_dta->motor_idx = MOTOR_INICIAL;
+	p_task_system_dta->parametro_idx = PARAM_INICIAL;
+
+	for (index = 0; CANT_MOTORES > index; index++)
 	{
-		/* Update Task System Data Pointer */
-		p_task_system_dta = &task_system_dta_list[index];
-
-		/* Init & Print out: Task execution FSM */
-		state = ST_SYS_IDLE;
-		p_task_system_dta->state = state;
-
-		event = EV_SYS_IDLE;
-		p_task_system_dta->event = event;
-
-		b_event = false;
-		p_task_system_dta->flag = b_event;
-
-		LOGGER_INFO(" ");
-		LOGGER_INFO("   %s = %lu   %s = %lu   %s = %s",
-					GET_NAME(state), (uint32_t)state,
-					GET_NAME(event), (uint32_t)event,
-					GET_NAME(b_event), (b_event ? "true" : "false"));
+		p_task_system_dta->param_motor[index].power = POWER_INICIAL;
+		p_task_system_dta->param_motor[index].speed = SPEED_INICIAL;
+		p_task_system_dta->param_motor[index].spin = SPIN_INICIAL;
 	}
+
+
+
+
+	LOGGER_INFO(" ");
+	LOGGER_INFO("   %s = %lu   %s = %lu   %s = %s",
+				GET_NAME(state), (uint32_t)p_task_system_dta->state,
+				GET_NAME(event), (uint32_t)p_task_system_dta->event,
+				GET_NAME(b_event), (p_task_system_dta->flag ? "true" : "false"));
+
+
 
 	put_event_task_display(0, 0, "task_system_mode");
 	put_event_task_display(0, 1, " NORMAL         ");
@@ -174,8 +214,8 @@ void task_system_normal_statechart(void)
 				put_event_task_actuator(EV_LED_ACTIVE, ID_LED_A);
 				p_task_system_dta->state = ST_SYS_ACTIVE;
 
-				put_event_task_display(0, 0, "task_system_mode");
-				put_event_task_display(0, 1, " SETUP          ");
+				/* Al entrar a SETUP se muestra la pantalla Main del menu */
+				task_system_setup_display(&task_system_dta_list[SETUP]);
 
 				task_system_set_mode(SETUP);
 			}
@@ -207,6 +247,7 @@ void task_system_normal_statechart(void)
 void task_system_setup_statechart(void)
 {
 	task_system_dta_t *p_task_system_dta;
+	bool b_flag_before;
 
 	/* Update Task System Data Pointer */
 	p_task_system_dta = &task_system_dta_list[SETUP];
@@ -217,44 +258,183 @@ void task_system_setup_statechart(void)
 		p_task_system_dta->event = get_event_task_system();
 	}
 
+	/* Se guarda el flag para saber despues si alguna transicion consumio el evento */
+	b_flag_before = p_task_system_dta->flag;
+
 	switch (p_task_system_dta->state)
 	{
-		case ST_SYS_IDLE:
 
-			if ((true == p_task_system_dta->flag) && (EV_SYS_BTN_A == p_task_system_dta->event))
+		case ST_SYS_MAIN:
+			if ( (true == p_task_system_dta->flag) && (EV_SYS_ENTER == p_task_system_dta->event) )
 			{
+				p_task_system_dta->motor_idx = MOTOR_INICIAL;
 				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_ACTIVE, ID_LED_A);
-				p_task_system_dta->state = ST_SYS_ACTIVE;
-
-				put_event_task_display(0, 0, "task_system_mode");
-				put_event_task_display(0, 1, " NORMAL         ");
+				p_task_system_dta->state = ST_SYS_MENU_1;
+			}
+			else if ( (true == p_task_system_dta->flag) && (EV_SYS_BTN_A == p_task_system_dta->event) )
+			{
 
 				task_system_set_mode(NORMAL);
+				put_event_task_display(0, 0, "task_system_mode");
+				put_event_task_display(0, 1, " NORMAL         ");
+				p_task_system_dta->flag = false;
 			}
 
 			break;
 
-		case ST_SYS_ACTIVE:
-
-			if ((true == p_task_system_dta->flag) && (EV_SYS_IDLE == p_task_system_dta->event))
+		case ST_SYS_MENU_1:
+			if ( (true == p_task_system_dta->flag) && (EV_SYS_NEXT == p_task_system_dta->event) )
 			{
+				p_task_system_dta->motor_idx = (p_task_system_dta->motor_idx+1)%CANT_MOTORES;
 				p_task_system_dta->flag = false;
-				put_event_task_actuator(EV_LED_IDLE, ID_LED_A);
-				p_task_system_dta->state = ST_SYS_IDLE;
+			} else if ( (true == p_task_system_dta->flag) && (EV_SYS_ENTER == p_task_system_dta->event) )
+			{
+				p_task_system_dta->state = ST_SYS_MENU_2;
+				p_task_system_dta->parametro_idx = PARAM_INICIAL;
+				p_task_system_dta->flag = false;
+			} else if ( (true == p_task_system_dta->flag) && (EV_SYS_ESCAPE == p_task_system_dta->event) )
+			{
+				p_task_system_dta->state = ST_SYS_MAIN;
+				p_task_system_dta->flag = false;
 			}
 
+		break;
+
+		case ST_SYS_MENU_2:
+			if ( (true == p_task_system_dta->flag) && (EV_SYS_NEXT == p_task_system_dta->event) )
+			{
+				p_task_system_dta->parametro_idx = (p_task_system_dta->parametro_idx + 1) % PARAM_QTY;
+				p_task_system_dta->flag = false;
+			}
+			else if ( (true == p_task_system_dta->flag) && (EV_SYS_ENTER == p_task_system_dta->event) )
+			{
+				p_task_system_dta->state = ST_SYS_MENU_3;
+				p_task_system_dta->flag = false;
+			}
+			else if ( (true == p_task_system_dta->flag) && (EV_SYS_ESCAPE == p_task_system_dta->event) )
+			{
+				p_task_system_dta->state = ST_SYS_MENU_1;
+				p_task_system_dta->flag = false;
+			}
+
+			break;
+
+		case ST_SYS_MENU_3:
+			if ( (true == p_task_system_dta->flag) && (EV_SYS_NEXT == p_task_system_dta->event) )
+			{
+				p_task_system_dta->flag = false;
+				switch (p_task_system_dta->parametro_idx)
+				{
+					case SPEED:
+						if (p_task_system_dta->param_motor[p_task_system_dta->motor_idx].speed < MAX_SPEED)
+						{
+							p_task_system_dta->param_motor[p_task_system_dta->motor_idx].speed++;
+						}
+						else
+						{
+							p_task_system_dta->param_motor[p_task_system_dta->motor_idx].speed = 0;
+						}
+						break;
+					case POWER:
+						p_task_system_dta->param_motor[p_task_system_dta->motor_idx].power = !p_task_system_dta->param_motor[p_task_system_dta->motor_idx].power ;
+						break;
+					case SPIN:
+						p_task_system_dta->param_motor[p_task_system_dta->motor_idx].spin = (p_task_system_dta->param_motor[p_task_system_dta->motor_idx].spin + 1)%SPIN_QTY;
+						break;
+					default: break;
+				}
+			} else if ( (true == p_task_system_dta->flag) && (EV_SYS_ESCAPE == p_task_system_dta->event) )
+			{
+				p_task_system_dta->state = ST_SYS_MENU_2;
+				p_task_system_dta->flag = false;
+			}
 			break;
 
 		default:
 
-			p_task_system_dta->tick  = DEL_SYS_MIN;
-			p_task_system_dta->state = ST_SYS_IDLE;
+			p_task_system_dta->state = ST_SYS_MAIN;
 			p_task_system_dta->event = EV_SYS_IDLE;
 			p_task_system_dta->flag = false;
 
 			break;
 	}
+
+	/* Si se consumio un evento y seguimos en SETUP, se refresca el LCD */
+	if ((true == b_flag_before) && (false == p_task_system_dta->flag) && (SETUP == g_task_system_mode))
+	{
+		task_system_setup_display(p_task_system_dta);
+	}
+}
+
+static void task_system_pad_line(char *line)
+{
+	size_t len = strlen(line);
+
+	/* Completa con espacios hasta COLUMNS para borrar restos del texto anterior */
+	while (COLUMNS > len)
+		line[len++] = ' ';
+	line[COLUMNS] = '\0';
+}
+
+static void task_system_setup_display(task_system_dta_t *p_dta)
+{
+	char line0[COLUMNS + 1];
+	char line1[COLUMNS + 1];
+	param_motor_t *p_motor = &p_dta->param_motor[p_dta->motor_idx];
+	unsigned long motor_n  = (unsigned long)(p_dta->motor_idx + 1);
+
+	switch (p_dta->state)
+	{
+		case ST_SYS_MAIN:
+			snprintf(line0, sizeof(line0), "Mot1: %s, %lu, %c",
+					 p_dta->param_motor[0].power ? "ON" : "OFF",
+					 (unsigned long)p_dta->param_motor[0].speed,
+					 p_spin_name[p_dta->param_motor[0].spin][0]);
+			snprintf(line1, sizeof(line1), "Mot2: %s, %lu, %c",
+					 p_dta->param_motor[1].power ? "ON" : "OFF",
+					 (unsigned long)p_dta->param_motor[1].speed,
+					 p_spin_name[p_dta->param_motor[1].spin][0]);
+			break;
+
+		case ST_SYS_MENU_1:
+			snprintf(line0, sizeof(line0), "Menu 1: Motor");
+			snprintf(line1, sizeof(line1), "> Motor %lu", motor_n);
+			break;
+
+		case ST_SYS_MENU_2:
+			snprintf(line0, sizeof(line0), "Menu 2: Motor %lu", motor_n);
+			snprintf(line1, sizeof(line1), "> %s", p_param_name[p_dta->parametro_idx]);
+			break;
+
+		case ST_SYS_MENU_3:
+			snprintf(line0, sizeof(line0), "Menu 3: M%lu %s", motor_n,
+					 p_param_name[p_dta->parametro_idx]);
+			switch (p_dta->parametro_idx)
+			{
+				case SPEED:
+					snprintf(line1, sizeof(line1), "> %lu", (unsigned long)p_motor->speed);
+					break;
+				case POWER:
+					snprintf(line1, sizeof(line1), "> %s", p_motor->power ? "ON" : "OFF");
+					break;
+				case SPIN:
+					snprintf(line1, sizeof(line1), "> %s", p_spin_name[p_motor->spin]);
+					break;
+				default:
+					line1[0] = '\0';
+					break;
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	task_system_pad_line(line0);
+	task_system_pad_line(line1);
+
+	put_event_task_display(0, 0, line0);
+	put_event_task_display(0, 1, line1);
 }
 
 void task_system_set_mode(task_system_mode_t task_system_mode)

@@ -1,20 +1,7 @@
-21:20:52 **** Build of configuration Debug for project tdse-tp3_03-system_setup_menu ****
-make -j8 all 
-arm-none-eabi-gcc -o "tdse-tp3_03-system_setup_menu.elf" @"objects.list"  -lrdimon -mcpu=cortex-m3 -T"C:\Users\alang\Desktop\tse\TP3\tdse-tp3_03-system_setup_menu\tdse-tp3_03-system_setup_menu\STM32F103RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="tdse-tp3_03-system_setup_menu.map" -Wl,--gc-sections -static -specs=rdimon.specs --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: tdse-tp3_03-system_setup_menu.elf
- 
-arm-none-eabi-size  tdse-tp3_03-system_setup_menu.elf 
-arm-none-eabi-objdump -h -S tdse-tp3_03-system_setup_menu.elf  > "tdse-tp3_03-system_setup_menu.list"
-   text	   data	    bss	    dec	    hex	filename
-  19752	    172	   2444	  22368	   5760	tdse-tp3_03-system_setup_menu.elf
-Finished building: default.size.stdout
- 
-Finished building: tdse-tp3_03-system_setup_menu.list
- 
-21:20:58 **** Incremental Build of configuration Debug for project tdse-tp3_03-system_setup_menu ****
+20:50:39 **** Incremental Build of configuration Debug for project tdse-tp3_03-system_setup_menu ****
 make -j8 all 
 arm-none-eabi-size  tdse-tp3_03-system_setup_menu.elf 
    text	   data	    bss	    dec	    hex	filename
-  19752	    172	   2444	  22368	   5760	tdse-tp3_03-system_setup_menu.elf
+  21168	    192	   2488	  23848	   5d28	tdse-tp3_03-system_setup_menu.elf
 Finished building: default.size.stdout
  
